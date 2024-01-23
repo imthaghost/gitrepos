@@ -2,7 +2,7 @@ FROM golang:alpine3.19
 
 # Enviornment variables
 ENV APP_NAME gitrepos
-ENV PORT 2222
+ENV PORT 22
 
 
 RUN apk update

@@ -1,14 +1,11 @@
 package main
 
 import (
-	"fmt"
-	"log"
-	"os"
-
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/gliderlabs/ssh"
+	"log"
 )
 
 type Repo struct {
@@ -54,8 +51,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m model) View() string {
 	return docStyle.Render(m.list.View())
 }
-func main() {
 
+func main() {
+	log.Println("main")
 	items := []list.Item{
 		item{title: "Raspberry Pi’s", desc: "I have ’em all over my house"},
 		item{title: "Nutella", desc: "It's good on toast"},
@@ -82,24 +80,19 @@ func main() {
 		item{title: "Terrycloth", desc: "In other words, towel fabric"},
 	}
 
-	m := model{list: list.New(items, list.NewDefaultDelegate(), 0, 0)}
+	m := model{list: list.New(items, list.NewDefaultDelegate(), 80, 20)}
 	m.list.Title = "My Fave Things"
 
 	ssh.Handle(func(s ssh.Session) {
-		p := tea.NewProgram(m, tea.WithAltScreen())
-
-		if _, err := p.Run(); err != nil {
-			fmt.Println("Error running program:", err)
-			os.Exit(1)
+		p := tea.NewProgram(m, tea.WithInput(s), tea.WithOutput(s), tea.WithoutCatchPanics(), tea.WithMouseCellMotion(), tea.WithAltScreen())
+		_, err := p.Run()
+		if err != nil {
+			log.Println(err)
 		}
-		if err := p.Start(); err != nil {
-			fmt.Printf("Alas, there's been an error: %v", err)
-			os.Exit(1)
-		}
-
-		log.Println("starting ssh server on port 2222...")
-		log.Fatal(ssh.ListenAndServe(":2222", nil))
 	})
+
+	log.Println("starting ssh server on port 22...")
+	log.Fatal(ssh.ListenAndServe(":22", nil))
 
 }
 
